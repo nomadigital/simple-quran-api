@@ -1,222 +1,309 @@
-<div id="app">
-  <at-card
-    class="container container-fluid bg-blue-lighter"
-    no-hover>
-    <h1 class="app-title">simple-quran-api</h1>
-    <div class="row at-row">
-      <at-card
-        class="col-xs-24 col-md-6 bg-blue-light"
-        no-hover>
-        <label>Languages:</label>
-        <at-select v-model="lang">
-          <at-option
-            v-for="(value, key) in langList"
-            :key="key"
-            :value="key">
-            {{ value }}
-          </at-option>
-        </at-select>
-        <label>Sura:</label>
-        <at-select v-model="sura">
-          <at-option
-            v-for="sura in suraList"
-            :key="sura.id"
-            :value="sura.id">
-            {{ sura.title }}
-          </at-option>
-        </at-select>
-        <label>Aya:</label>
-        <at-select v-model="aya">
-          <at-option
-            v-for="aya in ayat"
-            :key="aya"
-            :value="aya">
-            {{ aya }}
-          </at-option>
-        </at-select>
-        <p>Total ayat: <strong>{{ ayat }}</strong></p>
-        <p>Revealed at: <strong>{{ revealed }}</strong></p>
-        <p>Translated by: <strong>{{ translator }}</strong></p>
-      </at-card>
-      
-      <at-card
-        :loading="loading"
-        class="col-xs-24 col-md-18 quran-card bg-orange-lighter"
-        no-hover>
-        <div class="row at-row flex-center">
-          <at-pagination
-            :total="ayat"
-            :page-size="pageSize"
-            :current="currentPage"
-            @page-change="pageChange($event)"
-            simple></at-pagination>
-        </div>
-        </br>
-        <h1 v-if="sura != 9"
-          class="basmallah rtl-text">
-          {{ basmallah }}
-        </h1>
-        </br>
-        <div
-          class="row at-row flex-center ayat-text"
-          :class="{'rtl-text': rtlLang}">
-          <span v-for="line in text">
-            {{ line | basmallah }}
-            <span v-if="rtlLang">﴿</span>
-            <span v-else>﴾</span>
-            {{ line.aya | oneDigit }}
-            <span v-if="rtlLang">﴾</span>
-            <span v-else>﴿</span>
-          </span>
-        </div>
-      </at-card>
-    </div>
-  </at-card>
-</div>
-<!-- development version, includes helpful console warnings -->
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<!-- production version, optimized for size and speed -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/at-ui-style/css/at.min.css">
-<style type = "text/css">
-  @font-face {
-    font-family: "Uthmani-Hafs";
-    src: url("./fonts/Uthmani-Hafs.otf");
-  }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/at-ui/dist/at.min.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="languages.js"></script>
-<script src="treeInfo.js"></script>
-<style>
-  #app {
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-  }
-  .basmallah {
-    font-family: 'Uthmani-Hafs', serif;
-    font-size: 25px;
-    text-align: center;
-  }
-  .ayat-text {
-    overflow: auto;
-    max-height: 350px;
-    font-family: 'Uthmani-Hafs', serif;
-    font-size: 25px;
-  }
-  .quran-card {
-    height: 500px;
-  }
-  .rtl-text {
-    direction: rtl;
-  }
-  .bg-blue-lighter {
-    background-color: #EFF4FE;
-  }
-  .bg-blue-light {
-    background-color: #B0C8F4;
-  }
-  .app-title {
-    font-size: 35px;
-    text-align: center;
-  }
-</style>
-<script>
-  const baseUrl = 'https://ibbtek.github.io/simple-quran-api/api/'
+<!-- https://github.com/pages-themes/architect/blob/master/_layouts/default.html -->
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}" media="screen" type="text/css">
+    <link rel="stylesheet" href="{{ '/assets/css/print.css' | relative_url }}" media="print" type="text/css">
 
-  new Vue({
-    el: '#app',
-    data: {
-      basmallah: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-      lang: 'ar',
-      sura: 1,
-      aya: 1,
-      ayat: 7,
-      revealed: 'Mecca',
-      translator: '-',
-      currentPage: 1,
-      pageSize: 7,
-      text: [],
-      loading: false
-    },
-    watch: {
-      sura (value) {
-        let object = treeInfo.find(obj => obj.id === value)
-        this.ayat = object.ayat
-        this.revealed = object.revealed
-        this.aya = 1
-        this.currentPage = 1
-        this.fetchData()
-      },
-      aya (value) {
-        this.currentPage = Math.ceil(this.aya/this.pageSize) > 0 ? Math.ceil(this.aya/this.pageSize) : 1
-      },
-      currentPage (value) {
-        this.fetchData()
-      },
-      lang (value) {
-        this.aya = 1
-        this.fetchData()
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+
+{% seo %}
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <a href="{{ '/' | absolute_url }}">
+          <h1>{{ site.title | default: site.github.repository_name }}</h1>
+        </a>
+        <h2>{{ site.description | default: site.github.project_tagline }}</h2>
+        {% if site.github.is_project_page %}
+          <a href="{{ site.github.repository_url }}" class="button"><small>View project on</small> GitHub</a>
+        {% endif %}
+        {% if site.github.is_user_page %}
+          <a href="{{ site.github.owner_url }}" class="button"><small>Follow me on</small> GitHub</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <div id="app">
+            <at-card
+              class="container container-fluid bg-blue-lighter"
+              no-hover>
+              <h1 class="app-title">simple-quran-api</h1>
+              <div class="row at-row">
+                <at-card
+                  class="col-xs-24 col-md-6 bg-blue-light"
+                  no-hover>
+                  <label>Languages:</label>
+                  <at-select v-model="lang">
+                    <at-option
+                      v-for="(value, key) in langList"
+                      :key="key"
+                      :value="key">
+                      {{ value }}
+                    </at-option>
+                  </at-select>
+                  <label>Sura:</label>
+                  <at-select v-model="sura">
+                    <at-option
+                      v-for="sura in suraList"
+                      :key="sura.id"
+                      :value="sura.id">
+                      {{ sura.title }}
+                    </at-option>
+                  </at-select>
+                  <label>Aya:</label>
+                  <at-select v-model="aya">
+                    <at-option
+                      v-for="aya in ayat"
+                      :key="aya"
+                      :value="aya">
+                      {{ aya }}
+                    </at-option>
+                  </at-select>
+                  <p>Total ayat: <strong>{{ ayat }}</strong></p>
+                  <p>Revealed at: <strong>{{ revealed }}</strong></p>
+                  <p>Translated by: <strong>{{ translator }}</strong></p>
+                </at-card>
+                
+                <at-card
+                  :loading="loading"
+                  class="col-xs-24 col-md-18 quran-card bg-orange-lighter"
+                  no-hover>
+                  <div class="row at-row flex-center">
+                    <at-pagination
+                      :total="ayat"
+                      :page-size="pageSize"
+                      :current="currentPage"
+                      @page-change="pageChange($event)"
+                      simple></at-pagination>
+                  </div>
+                  </br>
+                  <h1 v-if="sura != 9"
+                    class="basmallah rtl-text">
+                    {{ basmallah }}
+                  </h1>
+                  </br>
+                  <div
+                    class="row at-row flex-center ayat-text"
+                    :class="{'rtl-text': rtlLang}">
+                    <span v-for="line in text">
+                      {{ line | basmallah }}
+                      <span v-if="rtlLang">﴿</span>
+                      <span v-else>﴾</span>
+                      {{ line.aya | oneDigit }}
+                      <span v-if="rtlLang">﴾</span>
+                      <span v-else>﴿</span>
+                    </span>
+                  </div>
+                </at-card>
+              </div>
+            </at-card>
+          </div>
+        </section>
+
+        <aside id="sidebar">
+          <h3>Credits</h3>
+          <ul>
+            <li>API build: 
+              <a ref="https://github.com/eduardoboucas/static-api-generator" target="_blank">
+                static-api-generator
+              </a>
+            </li>
+            <li>Translations: 
+              <a ref="http://tanzil.net/docs/" target="_blank">
+                Tanzil.net
+              </a>
+            </li>
+          </ul>
+          <3>Example</3>
+          <ul>GET Sura Al-Fatiha in Arabic: 
+            <li>
+              <a href="https://ibbtek.github.io/simple-quran-api/api/ar/s001.json" target="_blank">
+                ibbtek.github.io/simple-quran-api/api/ar/s001.json
+              </a>
+            </li>
+          </ul>
+          <ul>GET Aya Al-Kursiy in English:
+            <li>
+              <a href="https://ibbtek.github.io/simple-quran-api/api/en/s002/v255.json" target="_blank">
+                ibbtek.github.io/simple-quran-api/api/en/s002/v255.json
+              </a>
+            </li>
+          </ul>
+          <p><small>More info <a href="https://github.com/ibbtek/simple-quran-api">here</a></small></p>
+          <p><style>.bmc-button img{width: 27px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button{line-height: 36px !important;height:37px !important;text-decoration: none !important;display:inline-flex !important;color:#000000 !important;background-color:#FFDD00 !important;border-radius: 3px !important;border: 1px solid transparent !important;padding: 1px 9px !important;font-size: 22px !important;letter-spacing: 0.6px !important;box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;margin: 0 auto !important;font-family:'Cookie', cursive !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;-o-transition: 0.3s all linear !important;-webkit-transition: 0.3s all linear !important;-moz-transition: 0.3s all linear !important;-ms-transition: 0.3s all linear !important;transition: 0.3s all linear !important;}.bmc-button:hover, .bmc-button:active, .bmc-button:focus {-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;text-decoration: none !important;box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;opacity: 0.85 !important;color:#000000 !important;}</style><link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/HEazcCDFS"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a></p>
+          <p class="repo-owner">Made with &#9749; by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+    {% if site.google_analytics %}
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', '{{ site.google_analytics }}', 'auto');
+        ga('send', 'pageview');
+      </script>
+    {% endif %}
+
+    <!-- development version, includes helpful console warnings -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <!-- production version, optimized for size and speed -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/at-ui-style/css/at.min.css">
+    <style type = "text/css">
+      @font-face {
+        font-family: "Uthmani-Hafs";
+        src: url("./fonts/Uthmani-Hafs.otf");
       }
-    },
-    computed: {
-      langList () {
-        return languages
-      },
-      suraList () {
-        return treeInfo
-      },
-      rtlLang () {
-        if (this.lang == 'ar' || this.lang == 'fa' || this.lang == 'ur' || this.lang == 'dv' ||
-        this.lang == 'ku' || this.lang == 'sd' || this.lang == 'ps' || this.lang == 'ug') {
-          return true
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/at-ui/dist/at.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="languages.js"></script>
+    <script src="treeInfo.js"></script>
+    <style>
+      #app {
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+      }
+      .basmallah {
+        font-family: 'Uthmani-Hafs', serif;
+        font-size: 25px;
+        text-align: center;
+      }
+      .ayat-text {
+        overflow: auto;
+        max-height: 350px;
+        font-family: 'Uthmani-Hafs', serif;
+        font-size: 25px;
+      }
+      .quran-card {
+        height: 500px;
+      }
+      .rtl-text {
+        direction: rtl;
+      }
+      .bg-blue-lighter {
+        background-color: #EFF4FE;
+      }
+      .bg-blue-light {
+        background-color: #B0C8F4;
+      }
+      .app-title {
+        font-size: 35px;
+        text-align: center;
+      }
+    </style>
+    <script>
+      const baseUrl = 'https://ibbtek.github.io/simple-quran-api/api/'
+
+      new Vue({
+        el: '#app',
+        data: {
+          basmallah: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+          lang: 'ar',
+          sura: 1,
+          aya: 1,
+          ayat: 7,
+          revealed: 'Mecca',
+          translator: '-',
+          currentPage: 1,
+          pageSize: 7,
+          text: [],
+          loading: false
+        },
+        watch: {
+          sura (value) {
+            let object = treeInfo.find(obj => obj.id === value)
+            this.ayat = object.ayat
+            this.revealed = object.revealed
+            this.aya = 1
+            this.currentPage = 1
+            this.fetchData()
+          },
+          aya (value) {
+            this.currentPage = Math.ceil(this.aya/this.pageSize) > 0 ? Math.ceil(this.aya/this.pageSize) : 1
+          },
+          currentPage (value) {
+            this.fetchData()
+          },
+          lang (value) {
+            this.aya = 1
+            this.fetchData()
+          }
+        },
+        computed: {
+          langList () {
+            return languages
+          },
+          suraList () {
+            return treeInfo
+          },
+          rtlLang () {
+            if (this.lang == 'ar' || this.lang == 'fa' || this.lang == 'ur' || this.lang == 'dv' ||
+            this.lang == 'ku' || this.lang == 'sd' || this.lang == 'ps' || this.lang == 'ug') {
+              return true
+            }
+            return false
+          }
+        },
+        filters: {
+          basmallah (line) {
+            if (line.aya == '001' && line.sura != '001') {
+              return line.text.replace('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', '')
+            }
+            return line.text
+          },
+          oneDigit (value) {
+          return parseInt(value, 10)
+          }
+        },
+        created () {
+          this.fetchData()
+        },
+        methods: {
+          pageChange (value) {
+            this.currentPage = value
+          },
+          fetchData () {
+            const closeLoading = this.$Message.loading({
+              message: 'Loading...',
+              duration: 0
+            })
+            this.loading = true
+            let url = baseUrl + this.lang + '/' + 's' + ('000' + this.sura).substr(-3)
+            if (this.currentPage !== 1) {
+              url = url + '-' + this.currentPage
+            }
+            url = url + '.json'
+            axios.get(url).then(response => {
+              this.text = response.data.results
+              this.translator = this.text[0].translator
+              this.loading = false
+              closeLoading()
+            }).catch(error => {
+              this.loading = false
+              closeLoading()
+              this.$Message.error('API error!')
+              console.log(error)
+            })
+          }
         }
-        return false
-      }
-    },
-    filters: {
-      basmallah (line) {
-        if (line.aya == '001' && line.sura != '001') {
-          return line.text.replace('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', '')
-        }
-        return line.text
-      },
-      oneDigit (value) {
-       return parseInt(value, 10)
-      }
-    },
-    created () {
-      this.fetchData()
-    },
-    methods: {
-      pageChange (value) {
-        this.currentPage = value
-      },
-      fetchData () {
-        const closeLoading = this.$Message.loading({
-          message: 'Loading...',
-          duration: 0
-        })
-        this.loading = true
-        let url = baseUrl + this.lang + '/' + 's' + ('000' + this.sura).substr(-3)
-        if (this.currentPage !== 1) {
-          url = url + '-' + this.currentPage
-        }
-        url = url + '.json'
-        axios.get(url).then(response => {
-          this.text = response.data.results
-          this.translator = this.text[0].translator
-          this.loading = false
-          closeLoading()
-        }).catch(error => {
-          this.loading = false
-          closeLoading()
-          this.$Message.error('API error!')
-          console.log(error)
-        })
-      }
-    }
-  })
-</script>
+      })
+    </script>
+  </body>
+</html>
