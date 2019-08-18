@@ -1,6 +1,7 @@
 ---
 permalink: /index.html
 ---
+
 # simple-quran-api
 
 ## Support
