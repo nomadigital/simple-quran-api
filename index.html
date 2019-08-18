@@ -1,0 +1,222 @@
+<div id="app">
+  <at-card
+    class="container container-fluid bg-blue-lighter"
+    no-hover>
+    <h1 class="app-title">simple-quran-api</h1>
+    <div class="row at-row">
+      <at-card
+        class="col-xs-24 col-md-6 bg-blue-light"
+        no-hover>
+        <label>Languages:</label>
+        <at-select v-model="lang">
+          <at-option
+            v-for="(value, key) in langList"
+            :key="key"
+            :value="key">
+            {{ value }}
+          </at-option>
+        </at-select>
+        <label>Sura:</label>
+        <at-select v-model="sura">
+          <at-option
+            v-for="sura in suraList"
+            :key="sura.id"
+            :value="sura.id">
+            {{ sura.title }}
+          </at-option>
+        </at-select>
+        <label>Aya:</label>
+        <at-select v-model="aya">
+          <at-option
+            v-for="aya in ayat"
+            :key="aya"
+            :value="aya">
+            {{ aya }}
+          </at-option>
+        </at-select>
+        <p>Total ayat: <strong>{{ ayat }}</strong></p>
+        <p>Revealed at: <strong>{{ revealed }}</strong></p>
+        <p>Translated by: <strong>{{ translator }}</strong></p>
+      </at-card>
+      
+      <at-card
+        :loading="loading"
+        class="col-xs-24 col-md-18 quran-card bg-orange-lighter"
+        no-hover>
+        <div class="row at-row flex-center">
+          <at-pagination
+            :total="ayat"
+            :page-size="pageSize"
+            :current="currentPage"
+            @page-change="pageChange($event)"
+            simple></at-pagination>
+        </div>
+        </br>
+        <h1 v-if="sura != 9"
+          class="basmallah rtl-text">
+          {{ basmallah }}
+        </h1>
+        </br>
+        <div
+          class="row at-row flex-center ayat-text"
+          :class="{'rtl-text': rtlLang}">
+          <span v-for="line in text">
+            {{ line | basmallah }}
+            <span v-if="rtlLang">﴿</span>
+            <span v-else>﴾</span>
+            {{ line.aya | oneDigit }}
+            <span v-if="rtlLang">﴾</span>
+            <span v-else>﴿</span>
+          </span>
+        </div>
+      </at-card>
+    </div>
+  </at-card>
+</div>
+<!-- development version, includes helpful console warnings -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- production version, optimized for size and speed -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/at-ui-style/css/at.min.css">
+<style type = "text/css">
+  @font-face {
+    font-family: "Uthmani-Hafs";
+    src: url("./fonts/Uthmani-Hafs.otf");
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/at-ui/dist/at.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="languages.js"></script>
+<script src="treeInfo.js"></script>
+<style>
+  #app {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .basmallah {
+    font-family: 'Uthmani-Hafs', serif;
+    font-size: 25px;
+    text-align: center;
+  }
+  .ayat-text {
+    overflow: auto;
+    max-height: 350px;
+    font-family: 'Uthmani-Hafs', serif;
+    font-size: 25px;
+  }
+  .quran-card {
+    height: 500px;
+  }
+  .rtl-text {
+    direction: rtl;
+  }
+  .bg-blue-lighter {
+    background-color: #EFF4FE;
+  }
+  .bg-blue-light {
+    background-color: #B0C8F4;
+  }
+  .app-title {
+    font-size: 35px;
+    text-align: center;
+  }
+</style>
+<script>
+  const baseUrl = 'https://ibbtek.github.io/simple-quran-api/api/'
+
+  new Vue({
+    el: '#app',
+    data: {
+      basmallah: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+      lang: 'ar',
+      sura: 1,
+      aya: 1,
+      ayat: 7,
+      revealed: 'Mecca',
+      translator: '-',
+      currentPage: 1,
+      pageSize: 7,
+      text: [],
+      loading: false
+    },
+    watch: {
+      sura (value) {
+        let object = treeInfo.find(obj => obj.id === value)
+        this.ayat = object.ayat
+        this.revealed = object.revealed
+        this.aya = 1
+        this.currentPage = 1
+        this.fetchData()
+      },
+      aya (value) {
+        this.currentPage = Math.ceil(this.aya/this.pageSize) > 0 ? Math.ceil(this.aya/this.pageSize) : 1
+      },
+      currentPage (value) {
+        this.fetchData()
+      },
+      lang (value) {
+        this.aya = 1
+        this.fetchData()
+      }
+    },
+    computed: {
+      langList () {
+        return languages
+      },
+      suraList () {
+        return treeInfo
+      },
+      rtlLang () {
+        if (this.lang == 'ar' || this.lang == 'fa' || this.lang == 'ur' || this.lang == 'dv' ||
+        this.lang == 'ku' || this.lang == 'sd' || this.lang == 'ps' || this.lang == 'ug') {
+          return true
+        }
+        return false
+      }
+    },
+    filters: {
+      basmallah (line) {
+        if (line.aya == '001' && line.sura != '001') {
+          return line.text.replace('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', '')
+        }
+        return line.text
+      },
+      oneDigit (value) {
+       return parseInt(value, 10)
+      }
+    },
+    created () {
+      this.fetchData()
+    },
+    methods: {
+      pageChange (value) {
+        this.currentPage = value
+      },
+      fetchData () {
+        const closeLoading = this.$Message.loading({
+          message: 'Loading...',
+          duration: 0
+        })
+        this.loading = true
+        let url = baseUrl + this.lang + '/' + 's' + ('000' + this.sura).substr(-3)
+        if (this.currentPage !== 1) {
+          url = url + '-' + this.currentPage
+        }
+        url = url + '.json'
+        axios.get(url).then(response => {
+          this.text = response.data.results
+          this.translator = this.text[0].translator
+          this.loading = false
+          closeLoading()
+        }).catch(error => {
+          this.loading = false
+          closeLoading()
+          this.$Message.error('API error!')
+          console.log(error)
+        })
+      }
+    }
+  })
+</script>
