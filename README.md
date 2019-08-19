@@ -10,7 +10,11 @@ permalink: /index.html
 
 ## Description
 
-A simple Quran API with GET endpoints by chapter/verse and with 43 translation
+A simple Quran API with GET endpoints by chapter/verse and with 43 translations
+
+## Demo
+
+[Try it here](https://ibbtek.github.io/simple-quran-api)
 
 ## Quickstart
 
