@@ -6,7 +6,7 @@ permalink: /index.html
 
 ## Support
 
-[![Buy Me A Coffee](img/buymeacoffee.png)](https://www.buymeacoffee.com/HEazcCDFS)
+[![Buy Me A Coffee](assets/img/buymeacoffee.png)](https://www.buymeacoffee.com/HEazcCDFS)
 
 ## Description
 
