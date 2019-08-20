@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="https://ibbtek.github.io/simple-quran-api/assets/css/style.css?v=a757f993e7e101c5c482c32839ed69d952739a37" media="screen" type="text/css">
     <link rel="stylesheet" href="https://ibbtek.github.io/simple-quran-api/assets/css/print.css" media="print" type="text/css">
-    <link rel="stylesheet" href="./assets/css/pti.css">
+    <link rel="stylesheet" href="./assets/css/pti.min.css">
     <!-- development version, includes helpful console warnings -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <!-- production version, optimized for size and speed -->
@@ -101,7 +101,7 @@
                   <p>Total ayat: <strong>{{ ayat }}</strong></p>
                 </div>
               </div>
-              <div class="pti-row pti-is-center pti-m-b-3">
+              <div class="pti-row pti-center pti-m-b-3">
                   <div class="pti-pagination">
                     <a @click="pageChange(-1)">&lt;</a>
                     <input v-model="currentPage"/><span> /{{ totalPages }}</span>
@@ -114,13 +114,13 @@
                     @page-change="pageChange($event)"
                     simple></at-pagination> -->
               </div>
-              <div class="pti-row pti-is-center pti-m-b-3">
+              <div class="pti-row pti-center pti-m-b-3">
                 <div v-if="sura != 9"
-                  class="basmallah pti-rtl-text">
+                  class="basmallah pti-m-b-lg pti-rtl-text">
                   {{ basmallah }}
                 </div>
               </div>
-              <div class="pti-row  pti-is-center ayat-text"
+              <div class="pti-row pti-center pti-text-center ayat-text"
                 :class="{'pti-rtl-text': rtlLang}">
                 <span v-for="line in text">
                   {{ line | basmallah }}
@@ -179,13 +179,14 @@
     <style>
       .basmallah {
         font-family: 'Uthmani-Hafs', serif;
-        font-size: 25px;
-        text-align: center;
+        font-size: 30px;
+        font-weight: 500;
       }
       .ayat-text {
         font-family: 'Uthmani-Hafs', serif;
         font-size: 25px;
-        text-align: center;
+        line-height: 2rem;
+        /* text-align: center; */
       }
     </style>
     <script>
