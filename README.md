@@ -14,14 +14,14 @@ A simple Quran API with GET endpoints by chapter/verse and with 43 translations
 
 ## Demo
 
-[Try it here](https://nomadmuslim.github.io/simple-quran-api)
+[Try it here](https://no-m-ad.github.io/simple-quran-api)
 
 ## Quickstart
 
 ### Base GET endpoint
 
 ```
-https://nomadmuslim.github.io/simple-quran-api/api
+https://no-m-ad.github.io/simple-quran-api/api
 ```
 
 | variable | description   | format          | example |
@@ -39,7 +39,7 @@ https://nomadmuslim.github.io/simple-quran-api/api
 
 Example to get third page of Sura Al-Baqara in Arabic:
 
-https://nomadmuslim.github.io/simple-quran-api/api/ar/s002-3.json
+https://no-m-ad.github.io/simple-quran-api/api/ar/s002-3.json
 
 ### GET Aya page
 
@@ -49,7 +49,7 @@ https://nomadmuslim.github.io/simple-quran-api/api/ar/s002-3.json
 
 Example to get Aya 286 (Aya Al-Kursi) of Sura Al-Baqara in English:
 
-https://nomadmuslim.github.io/simple-quran-api/api/en/s002/v255.json
+https://no-m-ad.github.io/simple-quran-api/api/en/s002/v255.json
 
 ## Credits
 
